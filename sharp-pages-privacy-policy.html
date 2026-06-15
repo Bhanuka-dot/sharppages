@@ -226,6 +226,60 @@
       font-size: 0.75rem;
       color: var(--muted);
     }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #f0ede8;
+        --paper: #131210;
+        --accent: #e0601e;
+        --muted: #9a9082;
+        --rule: #2c2824;
+      }
+      p, ul li { color: #cac4bc; }
+      .contact-card { background: #1c1916; }
+    }
+
+    [data-theme="dark"] {
+      --ink: #f0ede8;
+      --paper: #131210;
+      --accent: #e0601e;
+      --muted: #9a9082;
+      --rule: #2c2824;
+    }
+    [data-theme="dark"] p,
+    [data-theme="dark"] ul li { color: #cac4bc; }
+    [data-theme="dark"] .contact-card { background: #1c1916; }
+
+    [data-theme="light"] {
+      --ink: #0f0e0c;
+      --paper: #faf8f4;
+      --accent: #c8410a;
+      --muted: #7a7169;
+      --rule: #e4e0d8;
+    }
+    [data-theme="light"] p,
+    [data-theme="light"] ul li { color: #3a3630; }
+    [data-theme="light"] .contact-card { background: white; }
+
+    .theme-toggle {
+      margin-left: auto;
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 2rem;
+      padding: 0.35rem 0.75rem;
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-toggle svg { width: 14px; height: 14px; flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -235,6 +289,12 @@
       <a class="logo" href="/">Sharp Pages<span class="logo-dot">.</span></a>
       <div class="header-divider"></div>
       <span class="header-label">Privacy Policy</span>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <span id="themeLabel">Light</span>
+      </button>
     </div>
   </header>
 
@@ -342,5 +402,41 @@
     <span class="footer-copy">© 2026 Sharp Pages. All rights reserved.</span>
   </footer>
 
+  <script>
+    const html = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const icon = document.getElementById('themeIcon');
+    const label = document.getElementById('themeLabel');
+
+    const moonSVG = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    const sunSVG = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+
+    function getSystemPref() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function applyTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        icon.innerHTML = sunSVG;
+        label.textContent = 'Light';
+        btn.setAttribute('aria-label', 'Switch to light mode');
+      } else {
+        icon.innerHTML = moonSVG;
+        label.textContent = 'Dark';
+        btn.setAttribute('aria-label', 'Switch to dark mode');
+      }
+    }
+
+    const saved = localStorage.getItem('sp-theme');
+    applyTheme(saved || getSystemPref());
+
+    btn.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('sp-theme', next);
+      applyTheme(next);
+    });
+  </script>
 </body>
 </html>
